@@ -25,35 +25,9 @@ db.serialize(() => {
 
   jsonData.forEach((row, idx) => {
     if (idx === 0) return;
-    const [, , name, address, lat, long, description, symbolName, cost, temp, closedWeek, timeFrom, timeTill, accessibility, interest, additional] = row;
-    let timeFromFormatted = timeFrom;
-    let timeTillFormatted = timeTill;
+    const [, , name, address, lat, long, description, symbolName, cost, closedWeek, timeFrom, timeTill, accessibility, interest, additional] = row;
 
-    if(timeFromFormatted){
-      const timeFromInHours = parseFloat(timeFrom) * 24;
-      const timeFromHours = Math.floor(timeFromInHours);
-      const timeFromMinutes = Math.round((timeFromInHours % 1) * 60);
-
-      const timeFromHourFormatted = new Date();
-      timeFromHourFormatted.setHours(timeFromHours, timeFromMinutes, 0, 0);
-
-      timeFromFormatted = new Date(timeFromHourFormatted).toLocaleString();
-    }
-
-    if(timeTillFormatted){
-      const timeTillInHours = parseFloat(timeTill) * 24;
-
-      const timeTillHours = Math.floor(timeTillInHours);
-      const timeTillMinutes = Math.round((timeTillInHours % 1) * 60);
-  
-      const timeTillHourFormatted = new Date();
-      timeTillHourFormatted.setHours(timeTillHours, timeTillMinutes, 0, 0).toLocaleString();
-
-      timeTillFormatted = new Date(timeTillHourFormatted).toLocaleString();
-
-    }
-
-    insertStmt.run(name, address, lat, long, description, symbolName, cost, closedWeek, timeFromFormatted, timeTillFormatted, accessibility, interest, additional);
+    insertStmt.run(name, address, lat, long, description, symbolName, cost, closedWeek, timeFrom, timeTill, accessibility, interest, additional);
   });
 
   insertStmt.finalize();

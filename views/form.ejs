@@ -12,9 +12,18 @@
     <label for="date">Date:</label>
     <input type="date" id="date" name="date" required><br><br>
     <label for="from_time">From Time:</label>
-    <input type="time" id="from_time" name="from_time" required><br><br>
+    <select id="from_time" name="from_time" required>
+      <% for (var i = 1; i <= 24; i++) { %>
+        <option value="<%= i %>"><%= i %></option>
+      <% } %>
+    </select><br><br>
+    
     <label for="to_time">To Time:</label>
-    <input type="time" id="to_time" name="to_time" required><br><br>
+    <select id="to_time" name="to_time" required>
+      <% for (var i = 1; i <= 24; i++) { %>
+        <option value="<%= i %>"><%= i %></option>
+      <% } %>
+    </select><br><br>
     <label for="accessibility">Accessibility:</label>
     <select id="accessibility" name="accessibility" required>
       <option value="public">Public</option>
