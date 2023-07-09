@@ -18,16 +18,42 @@ db.serialize(() => {
   db.run('DROP TABLE IF EXISTS cities');
 
   // Create a new table
-  db.run('CREATE TABLE cities (name TEXT, address TEXT, lat TEXT, long TEXT, description TEXT, symbolName TEXT, cost TEXT, closedWeek TEXT, timeFrom TEXT, timeTill TEXT, accessibility TEXT, interest TEXT, additional TEXT)');
+  db.run('CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT, address TEXT, lat TEXT, long TEXT, description TEXT, symbolName TEXT, cost TEXT, closedWeek TEXT, timeFrom DATETIME, timeTill DATETIME, accessibility TEXT, interest TEXT, additional TEXT)');
 
   // Prepare the insert statement
   const insertStmt = db.prepare('INSERT INTO cities (name, address, lat, long, description, symbolName, cost, closedWeek, timeFrom, timeTill, accessibility, interest, additional) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
 
   jsonData.forEach((row, idx) => {
-    if(idx === 0) return ;
+    if (idx === 0) return;
     const [, , name, address, lat, long, description, symbolName, cost, temp, closedWeek, timeFrom, timeTill, accessibility, interest, additional] = row;
+    let timeFromFormatted = timeFrom;
+    let timeTillFormatted = timeTill;
 
-    insertStmt.run(name, address, lat, long, description, symbolName, cost, closedWeek, timeFrom, timeTill, accessibility, interest, additional);
+    if(timeFromFormatted){
+      const timeFromInHours = parseFloat(timeFrom) * 24;
+      const timeFromHours = Math.floor(timeFromInHours);
+      const timeFromMinutes = Math.round((timeFromInHours % 1) * 60);
+
+      const timeFromHourFormatted = new Date();
+      timeFromHourFormatted.setHours(timeFromHours, timeFromMinutes, 0, 0);
+
+      timeFromFormatted = new Date(timeFromHourFormatted).toLocaleString();
+    }
+
+    if(timeTillFormatted){
+      const timeTillInHours = parseFloat(timeTill) * 24;
+
+      const timeTillHours = Math.floor(timeTillInHours);
+      const timeTillMinutes = Math.round((timeTillInHours % 1) * 60);
+  
+      const timeTillHourFormatted = new Date();
+      timeTillHourFormatted.setHours(timeTillHours, timeTillMinutes, 0, 0).toLocaleString();
+
+      timeTillFormatted = new Date(timeTillHourFormatted).toLocaleString();
+
+    }
+
+    insertStmt.run(name, address, lat, long, description, symbolName, cost, closedWeek, timeFromFormatted, timeTillFormatted, accessibility, interest, additional);
   });
 
   insertStmt.finalize();
