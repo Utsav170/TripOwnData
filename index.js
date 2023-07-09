@@ -15,16 +15,16 @@ app.get('/', (req, res) => {
 });
 
 app.post('/submit', (req, res) => {
-  const { cost, date, from_time, to_time, accessibility } = req.body;
+  const { cost, date, from_time, to_time, accessibility, interest } = req.body;
   const dayOfWeek = new Date(date).getDay();
 
-  console.log({dayOfWeek})
-  
-  const query = `SELECT * FROM cities WHERE cost = ? AND ',' || closedWeek || ',' NOT LIKE '%,' || ? || ',%' AND accessibility = ?`;
+  const isAccessible = accessibility === 'true' ? 'Yes' : 'No';
+
+  const query = `SELECT * FROM cities WHERE cost = ? AND ',' || closedWeek || ',' NOT LIKE '%,' || ? || ',%' AND accessibility = ? AND timeFrom = ? AND timeTill = ?`;
 
   db.all(
     query,
-    [cost, dayOfWeek, accessibility],
+    [cost, dayOfWeek, isAccessible, from_time, to_time],
     (error, results) => {
       if (error) {
         console.error('Error executing query:', error);
@@ -32,16 +32,27 @@ app.post('/submit', (req, res) => {
         return;
       }
 
-      console.log("results[0]", results)
+      console.log("results[0]", results);
 
-      if(!results.length) return res.status(400).send('No results found');
+      if (!results.length) return res.status(400).send('No results found');
+
+      const selectedInterests = Array.isArray(interest) ? interest : [interest];
+
+      const filteredResults = results.filter(result => {
+        const dbInterests = result.interest.split(',').map(interest => interest.trim());
+        return selectedInterests.some(selectedInterest => dbInterests.includes(selectedInterest));
+      });
+
+      if (filteredResults.length === 0) {
+        return res.status(400).send('No results found for the selected interests');
+      }
 
       const csvWriter = createCsvWriter({
         path: 'output.csv',
-        header: Object.keys(results[0]).map(column => ({ id: column, title: column }))
+        header: Object.keys(filteredResults[0]).map(column => ({ id: column, title: column }))
       });
 
-      csvWriter.writeRecords(results)
+      csvWriter.writeRecords(filteredResults)
         .then(() => {
           console.log('CSV file created successfully!');
           res.setHeader('Content-Type', 'text/csv');

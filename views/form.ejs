@@ -24,10 +24,20 @@
         <option value="<%= i %>"><%= i %></option>
       <% } %>
     </select><br><br>
+    <label for="interest">Interest:</label>
+    <select id="interest" name="interest" multiple>
+      <option value="Cultural Monument">Cultural Monument</option>
+      <option value="Eat and Drink">Eat and Drink</option>
+      <option value="Historical Monument">Historical Monument</option>
+      <option value="City Experience">City Experience</option>
+      <option value="Nature">Nature</option>
+      <option value="Art and Culture">Art and Culture</option>
+      <option value="Museum">Museum</option>
+    </select><br><br>
     <label for="accessibility">Accessibility:</label>
     <select id="accessibility" name="accessibility" required>
-      <option value="public">Public</option>
-      <option value="private">Private</option>
+      <option value="true">True</option>
+      <option value="false">False</option>
     </select><br><br>
     <button type="submit">Submit</button>
   </form>
