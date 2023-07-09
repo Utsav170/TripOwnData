@@ -18,15 +18,13 @@ app.post('/submit', (req, res) => {
   const { cost, date, from_time, to_time, accessibility } = req.body;
   const dayOfWeek = new Date(date).getDay();
 
-  // const query = `SELECT * FROM cities WHERE cost = ? AND CAST(closedWeek AS UNSIGNED) & ? = ? AND timeFrom = ? AND timeTill = ? AND accessibility = ?`;
-
-  const query = `SELECT * FROM cities WHERE cost = ? `;
+  console.log({dayOfWeek})
   
+  const query = `SELECT * FROM cities WHERE cost = ? AND ',' || closedWeek || ',' NOT LIKE '%,' || ? || ',%' AND accessibility = ?`;
 
   db.all(
     query,
-    // [cost, 1 << dayOfWeek, 1 << dayOfWeek, from_time, to_time, accessibility],
-    [cost],
+    [cost, dayOfWeek, accessibility],
     (error, results) => {
       if (error) {
         console.error('Error executing query:', error);
