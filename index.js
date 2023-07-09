@@ -20,11 +20,11 @@ app.post('/submit', (req, res) => {
 
   const isAccessible = accessibility === 'true' ? 'Yes' : 'No';
 
-  const query = `SELECT * FROM cities WHERE cost = ? AND ',' || closedWeek || ',' NOT LIKE '%,' || ? || ',%' AND accessibility = ? AND timeFrom = ? AND timeTill = ?`;
+  const query = `SELECT * FROM cities WHERE cost = ? AND ',' || closedWeek || ',' NOT LIKE '%,' || ? || ',%' AND accessibility = ?`;
 
   db.all(
     query,
-    [cost, dayOfWeek, isAccessible, from_time, to_time],
+    [cost, dayOfWeek, isAccessible],
     (error, results) => {
       if (error) {
         console.error('Error executing query:', error);
@@ -37,14 +37,14 @@ app.post('/submit', (req, res) => {
       if (!results.length) return res.status(400).send('No results found');
 
       const selectedInterests = Array.isArray(interest) ? interest : [interest];
-
       const filteredResults = results.filter(result => {
         const dbInterests = result.interest.split(',').map(interest => interest.trim());
-        return selectedInterests.some(selectedInterest => dbInterests.includes(selectedInterest));
+        const isTimeInRange = Number(result.timeFrom) <= Number(from_time) && Number(result.timeTill) >= Number(to_time);
+        return selectedInterests.some(selectedInterest => dbInterests.includes(selectedInterest)) && isTimeInRange;
       });
 
       if (filteredResults.length === 0) {
-        return res.status(400).send('No results found for the selected interests');
+        return res.status(400).send('No results found');
       }
 
       const csvWriter = createCsvWriter({
