@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Form</title>
+</head>
+<body>
+  <h1>Form</h1>
+  <form action="/submit" method="POST">
+    <label for="cost">Cost:</label>
+    <input type="text" id="cost" name="cost" required><br><br>
+    <label for="date">Date:</label>
+    <input type="date" id="date" name="date" required><br><br>
+    <label for="from_time">From Time:</label>
+    <input type="time" id="from_time" name="from_time" required><br><br>
+    <label for="to_time">To Time:</label>
+    <input type="time" id="to_time" name="to_time" required><br><br>
+    <label for="accessibility">Accessibility:</label>
+    <select id="accessibility" name="accessibility" required>
+      <option value="public">Public</option>
+      <option value="private">Private</option>
+    </select><br><br>
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
