@@ -26,9 +26,10 @@ app.post('/submit', (req, res) => {
   const queryParams = [];
 
   if (cost && cost <= 100) {
-    query += ' AND cost <= ?';
-    queryParams.push(cost);
-  } else if (cost && cost === 101) {
+    const upperRange = Number(cost) + 20;
+    query += ' AND cost >= ? AND cost <= ?';
+    queryParams.push(cost, upperRange);
+  } else if (cost && cost === 100) {
     query += ' AND cost > 100';
   }
 
@@ -66,7 +67,12 @@ app.post('/submit', (req, res) => {
 
       if (from_time && to_time) {
         filteredResults = filteredResults.filter(result => {
-          const isTimeInRange = Number(result.timeFrom) <= Number(from_time) && Number(result.timeTill) >= Number(to_time);
+          const isTimeInRange = (
+            (Number(from_time) >= Number(result.timeFrom) && Number(from_time) <= Number(result.timeTill)) ||
+            (Number(to_time) >= Number(result.timeFrom) && Number(to_time) <= Number(result.timeTill)) ||
+            (Number(from_time) <= Number(result.timeFrom) && Number(to_time) >= Number(result.timeTill)) ||
+            result.timeFrom === null && result.timeTill === null
+          );
           return isTimeInRange;
         });
       }
@@ -93,10 +99,10 @@ app.post('/submit', (req, res) => {
             const openDaysArray = dayNames.filter((weekday) => !closedWeekArray.includes(weekday));
             const openDays = openDaysArray.join(', ');
 
-            const fromTime = formatTime(result.timeFrom);
-            const toTime = formatTime(result.timeTill);
+            const fromTime = formatTime(result.timeFrom) || '';
+            const toTime = formatTime(result.timeTill) || '';
 
-            const description = `Cost: ${result.cost || 'Free'}\n\nOpen Days: ${openDays}\n\nTime: ${fromTime} - ${toTime}\n\nWheelchair Accessibility: ${result.accessibility}\n\nInterests: ${result.interest}\n\n${result.description}`; // Separate lines for cost, closedWeek, and description
+            const description = `Cost: ${result.cost || 'Free'}\n\nOpen Days: ${openDays}\n\nTime: ${fromTime ? `${fromTime} - ${toTime}` : '24/7'}\n\nWheelchair Accessibility: ${result.accessibility}\n\nInterests: ${result.interest}\n\n${result.description}`; // Separate lines for cost, closedWeek, and description
 
             result.description = description;
   

@@ -17,9 +17,9 @@
       <select id="cost" name="cost">
         <option value="">Select Cost</option>
         <% for (var i = 0; i < 100; i += 20) { %>
-          <option value="<%= i + 20 %>"><%= i %> - <%= i + 20 %></option>
+          <option value="<%= i %>"><%= i %> - <%= i + 20 %></option>
           <% } %>
-          <option value="101">100 above</option>
+          <option value="100">100 above</option>
       </select>
       <label for="date">Date:</label>
       <input type="date" id="date" name="date">
