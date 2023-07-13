@@ -14,20 +14,22 @@
     <h1>Welcome to <span class="logo"><img src="/images//TripOwl_logo.jpg" alt=""></span></h1>
     <form action="/submit" method="POST">
       <label for="cost">Cost:</label>
-      <input type="text" id="cost" name="cost" required>
+      <input type="text" id="cost" name="cost">
 
       <label for="date">Date:</label>
-      <input type="date" id="date" name="date" required>
+      <input type="date" id="date" name="date">
 
       <label for="from_time">From Time:</label>
-      <select id="from_time" name="from_time" required>
+      <select id="from_time" name="from_time">
+        <option value="">Select From time</option>
         <% for (var i = 1; i <= 24; i++) { %>
           <option value="<%= i %>"><%= i %></option>
         <% } %>
       </select>
 
       <label for="to_time">To Time:</label>
-      <select id="to_time" name="to_time" required>
+      <select id="to_time" name="to_time">
+        <option value="">Select to time</option>
         <% for (var i = 1; i <= 24; i++) { %>
           <option value="<%= i %>"><%= i %></option>
         <% } %>
@@ -45,9 +47,9 @@
       </select>
 
       <label for="accessibility">Accessibility:</label>
-      <select id="accessibility" name="accessibility" required>
+      <select id="accessibility" name="accessibility">
         <option value="true">True</option>
-        <option value="false">False</option>
+        <option value="false" selected>False</option>
       </select>
 
       <button type="submit">Submit</button>

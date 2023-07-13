@@ -22,11 +22,27 @@ app.post('/submit', (req, res) => {
 
   const isAccessible = accessibility === 'true' ? 'Yes' : 'No';
 
-  const query = `SELECT * FROM cities WHERE cost = ? AND ',' || closedWeek || ',' NOT LIKE '%,' || ? || ',%' AND accessibility = ?`;
+  let query = `SELECT * FROM cities WHERE 1 = 1`;
+  const queryParams = [];
+
+  if (cost) {
+    query += ' AND cost = ?';
+    queryParams.push(cost);
+  }
+
+  if (date) {
+    query += ' AND \',\' || closedWeek || \',\' NOT LIKE ?';
+    queryParams.push(`%,${dayOfWeek},%`);
+  }
+
+  if (accessibility === 'true') {
+    query += ' AND accessibility = ?';
+    queryParams.push(isAccessible);
+  }
 
   db.all(
     query,
-    [cost, dayOfWeek, isAccessible],
+    queryParams,
     (error, results) => {
       if (error) {
         console.error('Error executing query:', error);
@@ -35,14 +51,24 @@ app.post('/submit', (req, res) => {
       }
   
       if (!results.length) return res.status(400).send('No results found');
-  
-      const selectedInterests = Array.isArray(interest) ? interest : [interest];
-      const filteredResults = results.filter(result => {
-        const dbInterests = result.interest.split(',').map(interest => interest.trim());
-        const isTimeInRange = Number(result.timeFrom) <= Number(from_time) && Number(result.timeTill) >= Number(to_time);
-        return selectedInterests.some(selectedInterest => dbInterests.includes(selectedInterest)) && isTimeInRange;
-      });
-  
+
+      let filteredResults = results;
+
+      if (interest) {
+        const selectedInterests = Array.isArray(interest) ? interest : [interest];
+        filteredResults = results.filter(result => {
+          const dbInterests = result.interest.split(',').map(interest => interest.trim());
+          return selectedInterests.some(selectedInterest => dbInterests.includes(selectedInterest));
+        });
+      }
+
+      if (from_time && to_time) {
+        filteredResults = filteredResults.filter(result => {
+          const isTimeInRange = Number(result.timeFrom) <= Number(from_time) && Number(result.timeTill) >= Number(to_time);
+          return isTimeInRange;
+        });
+      }
+
       if (filteredResults.length === 0) {
         return res.status(400).send('No results found');
       }
@@ -68,7 +94,7 @@ app.post('/submit', (req, res) => {
             const fromTime = formatTime(result.timeFrom);
             const toTime = formatTime(result.timeTill);
 
-            const description = `Cost: ${result.cost}\n\nOpen Days: ${openDays}\n\nTime: ${fromTime} - ${toTime}\n\nWheelchair Accessibility: ${result.accessibility}\n\nInterests: ${result.interest}\n\n${result.description}`; // Separate lines for cost, closedWeek, and description
+            const description = `Cost: ${result.cost || 'Free'}\n\nOpen Days: ${openDays}\n\nTime: ${fromTime} - ${toTime}\n\nWheelchair Accessibility: ${result.accessibility}\n\nInterests: ${result.interest}\n\n${result.description}`; // Separate lines for cost, closedWeek, and description
 
             result.description = description;
   
@@ -82,7 +108,7 @@ app.post('/submit', (req, res) => {
         })
         .then(buffer => {
           res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-          res.setHeader('Content-Disposition', 'attachment; filename=output.xlsx');
+          res.setHeader('Content-Disposition', 'attachment; filename=trip-wishlist.xlsx');
           res.send(buffer);
         })
         .catch(error => {
