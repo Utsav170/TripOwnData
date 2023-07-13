@@ -6,55 +6,52 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caprasimo&display=swap" rel="stylesheet"> 
-  <style>
-    h1 {
-      font-family: 'Caprasimo', cursive;
-      color: white;
-      background-color: #f55e61;
-      text-align: center;
-    }
-    img{
-      width: 40px;
-      height: 40px;
-    }
-  </style>
+  <link href="/css/style.css" rel="stylesheet"> 
+
 </head>
 <body>
-  <h1>Welcome to <span> <img src="/TripOwl_logo.jpg" alt="" srcset=""></span></h1>
-  <form action="/submit" method="POST">
-    <label for="cost">Cost:</label>
-    <input type="text" id="cost" name="cost" required><br><br>
-    <label for="date">Date:</label>
-    <input type="date" id="date" name="date" required><br><br>
-    <label for="from_time">From Time:</label>
-    <select id="from_time" name="from_time" required>
-      <% for (var i = 1; i <= 24; i++) { %>
-        <option value="<%= i %>"><%= i %></option>
-      <% } %>
-    </select><br><br>
-    
-    <label for="to_time">To Time:</label>
-    <select id="to_time" name="to_time" required>
-      <% for (var i = 1; i <= 24; i++) { %>
-        <option value="<%= i %>"><%= i %></option>
-      <% } %>
-    </select><br><br>
-    <label for="interest">Interest:</label>
-    <select id="interest" name="interest" multiple>
-      <option value="Cultural Monument">Cultural Monument</option>
-      <option value="Eat and Drink">Eat and Drink</option>
-      <option value="Historical Monument">Historical Monument</option>
-      <option value="City Experience">City Experience</option>
-      <option value="Nature">Nature</option>
-      <option value="Art and Culture">Art and Culture</option>
-      <option value="Museum">Museum</option>
-    </select><br><br>
-    <label for="accessibility">Accessibility:</label>
-    <select id="accessibility" name="accessibility" required>
-      <option value="true">True</option>
-      <option value="false">False</option>
-    </select><br><br>
-    <button type="submit">Submit</button>
-  </form>
+  <div class="container">
+    <h1>Welcome to <span class="logo"><img src="/images//TripOwl_logo.jpg" alt=""></span></h1>
+    <form action="/submit" method="POST">
+      <label for="cost">Cost:</label>
+      <input type="text" id="cost" name="cost" required>
+
+      <label for="date">Date:</label>
+      <input type="date" id="date" name="date" required>
+
+      <label for="from_time">From Time:</label>
+      <select id="from_time" name="from_time" required>
+        <% for (var i = 1; i <= 24; i++) { %>
+          <option value="<%= i %>"><%= i %></option>
+        <% } %>
+      </select>
+
+      <label for="to_time">To Time:</label>
+      <select id="to_time" name="to_time" required>
+        <% for (var i = 1; i <= 24; i++) { %>
+          <option value="<%= i %>"><%= i %></option>
+        <% } %>
+      </select>
+
+      <label for="interest">Interest:</label>
+      <select id="interest" name="interest" multiple>
+        <option value="Cultural Monument">Cultural Monument</option>
+        <option value="Eat and Drink">Eat and Drink</option>
+        <option value="Historical Monument">Historical Monument</option>
+        <option value="City Experience">City Experience</option>
+        <option value="Nature">Nature</option>
+        <option value="Art and Culture">Art and Culture</option>
+        <option value="Museum">Museum</option>
+      </select>
+
+      <label for="accessibility">Accessibility:</label>
+      <select id="accessibility" name="accessibility" required>
+        <option value="true">True</option>
+        <option value="false">False</option>
+      </select>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
 </body>
 </html>
