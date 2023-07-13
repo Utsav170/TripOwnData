@@ -18,7 +18,7 @@ db.serialize(() => {
   db.run('DROP TABLE IF EXISTS cities');
 
   // Create a new table
-  db.run('CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT, address TEXT, lat TEXT, long TEXT, description TEXT, symbolName TEXT, cost TEXT, closedWeek TEXT, timeFrom TEXT, timeTill TEXT, accessibility TEXT, interest TEXT)');
+  db.run('CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT, address TEXT, lat INT, long INT, description TEXT, symbolName TEXT, cost TEXT, closedWeek TEXT, timeFrom TEXT, timeTill TEXT, accessibility TEXT, interest TEXT)');
 
   // Prepare the insert statement
   const insertStmt = db.prepare('INSERT INTO cities (name, address, lat, long, description, symbolName, cost, closedWeek, timeFrom, timeTill, accessibility, interest) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');

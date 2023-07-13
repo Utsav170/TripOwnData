@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
-const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const XlsxPopulate = require('xlsx-populate');
 
 const db = new sqlite3.Database('db.db');
 const app = express();
@@ -32,10 +32,9 @@ app.post('/submit', (req, res) => {
         return;
       }
 
-      console.log("results[0]", results);
-
       if (!results.length) return res.status(400).send('No results found');
 
+      console.log({results})
       const selectedInterests = Array.isArray(interest) ? interest : [interest];
       const filteredResults = results.filter(result => {
         const dbInterests = result.interest.split(',').map(interest => interest.trim());
@@ -47,20 +46,34 @@ app.post('/submit', (req, res) => {
         return res.status(400).send('No results found');
       }
 
-      const csvWriter = createCsvWriter({
-        path: 'output.csv',
-        header: Object.keys(filteredResults[0]).map(column => ({ id: column, title: column }))
-      });
+      // Create XLSX file using xlsx-populate
+      XlsxPopulate.fromBlankAsync()
+        .then(workbook => {
+          const sheet = workbook.sheet(0);
+          const headers = Object.keys(filteredResults[0]);
 
-      csvWriter.writeRecords(filteredResults)
-        .then(() => {
-          console.log('CSV file created successfully!');
-          res.setHeader('Content-Type', 'text/csv');
-          res.setHeader('Content-Disposition', 'attachment; filename=output.csv');
-          res.download('output.csv');
+          // Write headers
+          headers.forEach((header, columnIndex) => {
+            sheet.cell(1, columnIndex + 1).value(header);
+          });
+
+          // Write data
+          filteredResults.forEach((result, rowIndex) => {
+            headers.forEach((header, columnIndex) => {
+              sheet.cell(rowIndex + 2, columnIndex + 1).value(result[header]);
+            });
+          });
+
+          // Generate buffer from workbook
+          return workbook.outputAsync();
+        })
+        .then(buffer => {
+          res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+          res.setHeader('Content-Disposition', 'attachment; filename=output.xlsx');
+          res.send(buffer);
         })
         .catch(error => {
-          console.error('Error creating CSV file:', error);
+          console.error('Error creating XLSX file:', error);
           res.status(500).send('Internal Server Error');
         });
     }
