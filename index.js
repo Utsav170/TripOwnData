@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const XlsxPopulate = require('xlsx-populate');
+const { formatTime } = require('./utils/common');
 
 const db = new sqlite3.Database('db.db');
 const app = express();
@@ -32,39 +33,50 @@ app.post('/submit', (req, res) => {
         res.status(500).send('Internal Server Error');
         return;
       }
-
+  
       if (!results.length) return res.status(400).send('No results found');
-
-      console.log({results})
+  
       const selectedInterests = Array.isArray(interest) ? interest : [interest];
       const filteredResults = results.filter(result => {
         const dbInterests = result.interest.split(',').map(interest => interest.trim());
         const isTimeInRange = Number(result.timeFrom) <= Number(from_time) && Number(result.timeTill) >= Number(to_time);
         return selectedInterests.some(selectedInterest => dbInterests.includes(selectedInterest)) && isTimeInRange;
       });
-
+  
       if (filteredResults.length === 0) {
         return res.status(400).send('No results found');
       }
-
+  
       // Create XLSX file using xlsx-populate
       XlsxPopulate.fromBlankAsync()
         .then(workbook => {
           const sheet = workbook.sheet(0);
           const headers = Object.keys(filteredResults[0]);
-
+  
           // Write headers
           headers.forEach((header, columnIndex) => {
             sheet.cell(1, columnIndex + 1).value(header);
           });
-
+  
           // Write data
           filteredResults.forEach((result, rowIndex) => {
+            const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const closedWeekArray = result.closedWeek.split(',').map(dayIndex => dayNames[Number(dayIndex)].trim());
+            const openDaysArray = dayNames.filter((weekday) => !closedWeekArray.includes(weekday));
+            const openDays = openDaysArray.join(', ');
+
+            const fromTime = formatTime(result.timeFrom);
+            const toTime = formatTime(result.timeTill);
+
+            const description = `Cost: ${result.cost}\n\nOpen Days: ${openDays}\n\nTime: ${fromTime} - ${toTime}\n\nWheelchair Accessibility: ${result.accessibility}\n\nInterests: ${result.interest}\n\n${result.description}`; // Separate lines for cost, closedWeek, and description
+
+            result.description = description;
+  
             headers.forEach((header, columnIndex) => {
               sheet.cell(rowIndex + 2, columnIndex + 1).value(result[header]);
             });
           });
-
+  
           // Generate buffer from workbook
           return workbook.outputAsync();
         })
