@@ -34,7 +34,7 @@ app.post('/submit', (req, res) => {
   }
 
   if (date) {
-    query += ' AND \',\' || closedWeek || \',\' NOT LIKE ?';
+    query += ' AND (closedWeek IS NULL OR \',\' || closedWeek || \',\' NOT LIKE ?)';
     queryParams.push(`%,${dayOfWeek},%`);
   }
 
