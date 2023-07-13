@@ -25,9 +25,11 @@ app.post('/submit', (req, res) => {
   let query = `SELECT * FROM cities WHERE 1 = 1`;
   const queryParams = [];
 
-  if (cost) {
-    query += ' AND cost = ?';
+  if (cost && cost <= 100) {
+    query += ' AND cost <= ?';
     queryParams.push(cost);
+  } else if (cost && cost === 101) {
+    query += ' AND cost > 100';
   }
 
   if (date) {
@@ -87,7 +89,7 @@ app.post('/submit', (req, res) => {
           // Write data
           filteredResults.forEach((result, rowIndex) => {
             const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const closedWeekArray = result.closedWeek.split(',').map(dayIndex => dayNames[Number(dayIndex)].trim());
+            const closedWeekArray = (result.closedWeek || '').split(',').map(dayIndex => dayNames[Number(dayIndex)].trim());
             const openDaysArray = dayNames.filter((weekday) => !closedWeekArray.includes(weekday));
             const openDays = openDaysArray.join(', ');
 
