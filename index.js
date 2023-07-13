@@ -102,7 +102,7 @@ app.post('/submit', (req, res) => {
             const fromTime = formatTime(result.timeFrom) || '';
             const toTime = formatTime(result.timeTill) || '';
 
-            const description = `Cost: ${result.cost || 'Free'}\n\nOpen Days: ${openDays}\n\nTime: ${fromTime ? `${fromTime} - ${toTime}` : '24/7'}\n\nWheelchair Accessibility: ${result.accessibility}\n\nInterests: ${result.interest}\n\n${result.description}`; // Separate lines for cost, closedWeek, and description
+            const description = `Cost: ${result.cost || 'Free'}\n\nOpen Days: ${openDays}\n\nTime: ${result.timeFrom ? `${fromTime} - ${toTime}` : '24/7'}\n\nWheelchair Accessibility: ${result.accessibility}\n\nInterests: ${result.interest}\n\n${result.description}`; // Separate lines for cost, closedWeek, and description
 
             result.description = description;
   
