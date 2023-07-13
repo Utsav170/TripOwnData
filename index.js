@@ -7,6 +7,7 @@ const db = new sqlite3.Database('db.db');
 const app = express();
 
 app.set('view engine', 'ejs');
+app.use(express.static('assets'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
